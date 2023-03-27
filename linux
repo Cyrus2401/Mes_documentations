@@ -1,0 +1,140 @@
+							COMMANDES LINUX
+							
+	
+	ls : affiche les éléménts contenus dans un emplacement
+	ls -a : affiche les éléménts contenus dans un emplacement ainsi que ceux qui sont cachés
+	ls Documents : affiche tous les éléments contenus dans "Documents"
+	ls -l : affiche les éléménts contenus dans un emplacement avec plus de détail
+	ls -r : affiche les éléménts contenus dans un emplacement selon l'ordre alphabétique décroissant
+	ls -t : affiche les éléménts contenus dans un emplacement en triant les fichiers par horodatage
+	ls -S : affiche les éléménts contenus dans un emplacement en triant selon la taille par ordre décroissant
+	ls -h : affiche les éléménts contenus dans un emplacement en mettant la taille dans un format lisible par l'Homme
+	ls -lSr : affiche les éléménts contenus dans un emplacement par ordre alphabétique décroisant en triant par taille et avec plus de détail
+	ls -R : affiche non seulement le contenu d'un répertoire, mais également le contenu des sous-répertoires
+	ls -d /etc/s* : affiche uniquement les fichiers commençant par la lettre sdans le répertoire /etc
+	ls -d /etc/???? : affiche tous les fichiers du répertoire /etc contenant exactement quatre caractères
+	ls –d /etc/[abcd]* : affiche tous les fichiers du répertoire /etc commençant par les lettres a, b, c ou d
+	ls .. : affiche le contenu du répertoire parent
+	
+	Pour afficher le contenu d'un dossier dont le nom comporte des espaces, on utilise des guillemets (ls "mon dossier")
+	
+	pwd (print working directory) : affiche l’emplacement actuel dans lequel on se trouve
+	
+	cd [path] (change directory): changer de répertoire
+	cd .. : revenir au répertoire parent
+ 	cd ~ : revenir au répertoire personel 
+ 	
+	su : agir en tant que super Admin
+	sudo : exécuter des commandes en se faisant passer pour le super Admin
+	
+	chmod (change mode) : modifier les permissions d'un fichier
+	chown (change owner) : modifier le propriétaire d'un fichier 
+		Ex: chown cyrus hello.sh (le script 'hello.sh' aura pour propriétaire 'cyrus')
+		
+	NB -> Pour exécuter un script, on ajoute ./ devant le nom du script
+		Ex: ./hello.sh
+		
+	cat : affiche les contenus des petits fichiers
+	head : affiche les 10 premières lignes d'un fichier
+	tail : affiche les 10 dernières lignes d'un fichier
+	tail -n 5 file.txt : affiche les 5 dernières lignes du fichier 'file.txt'
+	
+	cp : copie de fichier
+		cp [Source] [Destination]
+		Ex: cd azerty Documents/ (Copie le fichier 'azerty' dans le dossier Documents)
+		
+	cp -v : permet de voir les détails de la copie
+		
+	dd : copie les fichiers ou des partitions au niveau du bit
+		Ex: dd if=/dev/zero of=/tmp/swape bs=1M count=50
+			if => le chemin du fichier à cloner
+			of => la destination du fichier à cloner 
+			bs => ??????? (pas obligatoire)
+			count => le nombre de fois qu'n veut cloner (pas obligatoire)
+			
+	mv : permet de déplacer un fichier d'un emplacement à autre ou renommer le fichier
+		mv [Source] [Destination]
+		Ex: mv azerty Documents/ (Déplace le fichier 'azerty' dans le dossier Documents)
+		Ex: mv azerty toto (Renomme le fichier 'azerty' en 'toto')
+	
+	rm : supprimer les fichiers 
+		rm [nomFichier]
+		Ex: rm azerty (Supprime le fichier 'azerty')
+		
+	rm -r : Supprimer un répertoire
+		rm [nomDoc]
+		Ex: rm Documents/ (Supprime le document 'Documents')
+		
+	grep : filtrer les textes 
+		grep ceQueVousVoulezChercher làOùVousVoulezChercher
+		grep [texteRecherché] fichier
+		Ex: grep Jr azerty (Filtre le texte 'Jr' dans le fichier 'azerty')
+						OU
+		Ex: cat qs | grep Jr (Filtre le texte 'Jr' dans le fichier 'azerty')
+		
+	shutdown : permet d'éteindre le système en toute sécurité
+		shutdown [option] [message]
+			option => now ou +1, +60 (en minute)
+		Ex: shutdown now 'azerty' (Eteinds la machine à l'instant)
+		Ex: shutdown +10 'azerty' (Eteinds la machine dans 10s)
+	
+	ifconfig : afficher les informations de configuration réseau de la machine
+	
+	ping : vérifier la connectivité de la machine dans un réseau
+	
+	ps : liste tous les processus en cours d'exécution dans le terminal
+	ps -e : liste tous les processus existant sur le système 
+	
+	passwd : modifie le mot de passe d'un utilisateur
+		passwq userName
+		Ex: passwd cyrus (Change le mot de passe de 'cyrus')
+	
+	passwd -S userName : affiche des informations d'Etat sur le mot de passe de l'utilisateur
+	
+	echo : imprime la sortie dans le terminal
+		 echo 'Hello World' (affiche 'Hello World' dans le terminal)
+	echo * : affiche tous les noms de fichiers du répertoire actuel qui correspondent au modèle glob
+	echo D* : affiche tous les noms de fichiers du répertoire courant qui commencent par une majuscule D et qui ont zéro ou plus de tout autre caractère après le D
+	echo *s : affiche tous les fichiers de votre répertoire courant qui se terminent par la lettre s
+	echo D*n*s : affiche tous les fichiers de votre répertoire courant qui commencent par D; comportent n et se terminent par la lettre s
+	echo ????? : affiche tous les fichiers de votre répertoire courant qui comportent 5 caractères
+	echo [DP]* : affiche tous les fichiers de votre répertoire courant qui commencent soit par D ou P  
+	echo [!DP]* : affiche tous les fichiers de votre répertoire courant qui ne commencent ni par D et ni par P
+	echo [D-P]* : affiche tous les fichiers de votre répertoire courant qui commencent par D et finissent par P                 
+		 
+	history : afficher l'historique d'un terminal
+	history 5 : afficher les 5 dernières commandes entrées
+	!-n : exécuter la nième commande à partir du bas de la liste de l'historique
+	
+	
+	date : 	afficher la date acutuelle
+	cal 1 2002 : affichera sous forme de calendrier le mois de Janvier 2002
+				
+	-----> Créer une allias
+		nomAllias = "cmd"
+			Ex: cyrusBirthMonth = "cal 1 2002"
+		Ainsi au lieu d'écrire "cal 1 2002" pour exécuter la commande, on tapera directement "cyrusBirthMonth"	
+		
+	-----> Créer une fonction
+		Syntaxe:
+			nom_fonction ()
+			{
+			   #commandes
+			}
+			
+	whoami : affiche le nom d'utilisateur de l'utilisateur actuel
+	
+	uname : affiche des informations sur le système actuel ; le nom du noyau que vous utilisez
+	uname -n : affiche le nom d'hôte du nœud de réseau
+	
+	type 'cmd' : affiche le type d'une commande
+		Ex: type ls
+		
+	man 'cmd' : afficher une page de manuel pour une commande
+		Ex: man ls
+	man -f 'cmd' ou whatis 'cmd' : affiche les pages de manuel qui correspondent, ou correspondent partiellement, à un nom spécifique et fournit le numéro de section et une brève description de chaque page de manuel 
+	man 5 passwd : affiche la page de manuel passwd située dans la section 5, qui est associée a la commande passwd
+	
+	whereis 'cmd' : rechercher l'emplacement d'une commande ou les pages de manuel d'une commande
+	
+	echo "" > nomFichier : pour supprimer le contenu d'un fichier sans le supprimer

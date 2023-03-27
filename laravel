@@ -1,0 +1,205 @@
+MOI PERSO QUAND JE DEMARRE UN PROJET LARAVEL 
+	- composer create-project laravel/laravel nomProjet ou composer create-project laravel/laravel:^8.0 nomProjet (pour spécifier la version de laravel) 
+	- aller dans le projet => cd nomProjet/
+	- composer require laravel/ui
+	- php artisan ui bootstrap/vue/react --auth ==> (en fonction de ce que tu veux entre bootstrap ou vue ou react)
+	- npm install 
+	- npm run dev 
+         
+	- npm run build
+	
+	****** SI JE VEUX UTILISER JQUERY 
+		- npm install jquery-ui --save-dev 
+		- // resources/assets/js/app.js
+			import $ from 'jquery';
+			window.$ = window.jQuery = $;
+			import 'jquery-ui/ui/widgets/datepicker.js';//add as many widget as you may need
+		- // resources/assets/sass/app.scss
+			@import '~jquery-ui/themes/base/all.css';
+	- npm install 
+	- npm run dev 
+	
+	****** SI JE VEUX UTILISER LARAVEL LIVEWIRE
+		- composer require livewire/livewire
+		- mettre @livewireStyles (avant la fermeture du </head>) et @livewireScripts (avant la fermeture du </body>)
+		
+	****** LARAVEL FORTIFY POUR L'AUTHENTIFICATION
+		- composer require laravel/fortify
+		- php artisan vendor:publish --provider="Laravel\Fortify\FortifyServiceProvider"
+		- php artisan migrate
+		- ajouter "App\Providers\FortifyServiceProvider::class" dans 'config/app.php' => Provider
+		- aller dans "App\Providers\FortifyServiceProvider" et dans la function boot()
+			
+			use Laravel\Fortify\Fortify;
+			use App\Models\User;
+			use Illuminate\Support\Facades\Hash;
+
+			Fortify::loginView(function () {
+			    return view('auth.login');
+			});
+
+			Fortify::authenticateUsing(function (Request $request) {
+			    $user = User::where('email', $request->email)->first();
+
+			    if ($user &&
+				Hash::check($request->password, $user->password)) {
+				return $user;
+			    }
+			});
+			
+	****** INSTALLER TAILWINDCSS 
+		- npm install -D tailwindcss@latest postcss@latest autoprefixer@latest
+		- npx tailwindcss init 
+		- ajouter dans "tailwind.config.js"
+			purge: [
+				'./resources/**/*.blade.php',
+				'./resources/**/*.js',
+				'./resources/**/*.vue',
+		   	],
+		- ajouter dans "webpack.mix.js"
+			mix.js('resources/js/app.js', 'public/js')
+			    .postCss('resources/css/app.css', 'public/css', [
+				require('tailwindcss')
+		    		]);
+		- ajouter dans "./resources/css/app.css"
+			@tailwind base;
+			@tailwind components;
+			@tailwind utilities;
+		- appeler tailwind dans le blade
+			<link href="{{ asset('css/app.css') }}" rel="stylesheet">
+		- npm install & npm run dev 
+		
+	****** INSTALLER ALPINE_JS
+		- npm install alpinejs
+		- aller dans "resources/js/app.js"
+			import 'alpinejs';
+			import Alpine from 'alpinejs'
+			window.Alpine = Alpine 
+			Alpine.start()
+		- appeler alpine dans le head du blade
+			 <script src="{{ asset('js/app.js') }}" defer></script>
+		- npm run dev 
+		
+	
+1- Créer une migration et un model en même temps ==> php artisan make:model Mangas -m
+   Créer une migration; un model et un controller en même temps ==> php artisan make:model Mangas -mc
+    "Mangas" est le nom du Model créé
+
+2- 	Pour valider la migration et créer la table au niveau de la BDD ==> php artisan migrate
+	Pour réactualiser la migration au niveau de la BDD ==> php artisan migrate
+	Pour truncate la table et valider la migration ==> php artisan migrate:fresh
+	Pour valider la migration sans préalablement truncate la table ==> php artisan migrate:refresh
+	Pour supprimer la dernière migration et revenir à l'avant dernière ==> php migrate:rollback
+	Pour revenir à une étape de migration donnée ==> php artisan migrate:rollback --step=1 (revenir à la première étape de migration)
+
+
+3- Ajouter un nouveau champ au niveau de la table ==> php artisan make:migration add_author_to_mangas_table --table=mangas
+	"author" est le nom du nouveau champs
+	"mangas" est le nom de la table
+	
+	
+4- Rendre les valeurs du champs unique : php artisan make:migration add_unique_constraint_on_email_in_users_table --table=users
+	"users" represente la table
+	"email" represente le champs 
+	
+5- POur les fichiers ==> php artisan storage:link
+
+6- Les logs de laravel se trouvent dans le dossier 'storage/logs' et sont contenus dans le fichier 'laravel.logs'
+	Pour y accéder, 'tail -f storage/logs/laravel.logs'
+	
+7- FIXTURES AVEC LARAVEL (Etape)
+	- Ecrire d'abord le code des fixtures (database/factories/UserFactory.php)
+	- Pour une nouvelle Factory ==> php artisan make:factory nomFactory
+	- Pour pouvoir envoyer les fixtures dans la BDD, entrer dans tinker avec ==> php artisan tinker
+	- Pour envoyer les fixtures, 
+		Entity::factory()->count(nombre)->create();
+			'Entity' est le nom de l'entité
+			'nombre' est le nombre de fausse données que vous voulez ajouter dans la BDD
+			
+	* Une autre façon pour lancer les fixtures est d'aller dans "database/seeders/DatabaseSeeder.php" et faire
+		model::factory(nombreElementsCrees)->create();
+			Ex: Post::factory(8)->create();
+	* Puis lancer ==> php artisan db:seed
+	
+8- UTILISER BOOTSTRAP
+	- composer require laravel/ui
+	- php artisan
+	 ui bootstrap
+	- npm install
+	- npm run 
+	
+9- Mettre l'application en maintenance ==> php artisan down
+
+10- Quitter le mode maintenance ==> php artisan up
+
+11- APP_ENV => désigne l'environnement de travail (production; local; développement)
+
+12- Pour créer sa commande personnelle ==> php artisan make:command SendEmails
+	'SendEmails' est le nom de la commande que vous souhaitez créer
+	- Un nouveau fichier SendEmails.php sera alors créer dans app/Commands
+	- Doner un nom et une description à la commande
+	- Vous écrivez ce que fera votre commande à l'intérieur
+	- Et pour lancer la commande ==> php artisan nomDeLaCommande
+	
+13- Pour exécuter sa commande à un temps donné, il faut se rendre dans app/Console/Kernel.php
+	- Ecrire dans la fonction schedule par exemple,  $schedule->command('sendEmail')->everyMinute(); 
+	- Cette fonction enverra un mail chaque minute
+	- Pour éxecuter ==> php artisan schedule:run
+	
+14- Pour créer un cron, il faut aller dans '/etc/cron'
+	- dans le fichier cronTab, faire
+		* * * * * cd /path-to-your-project && php artisan schedule:run >> /dev/null 2>&1
+	- reload apache
+
+15- Pour convertir une date en français, 
+	use Carbon\Carbon;
+	 
+	$date = Carbon::now()->locale('fr_FR');
+
+	echo $date->locale();            // fr_FR
+	echo "\n";
+	echo $date->diffForHumans();     // il y a 1 seconde
+	echo "\n";
+	echo $date->monthName;           // décembre
+	echo "\n";
+	echo $date->isoFormat('LLLL');   // samedi 31 décembre 2022 15:56
+
+16- Pour donner les valeurs valides pour un champ dans la BDD lors de la migration, 
+	table->enum('difficulty', ['easy', 'hard']); ==> le champs 'difficulty' ne prends que deux valeurs qui sont : 'easy' et 'hard'
+
+17- SEEDER AVEC LARAVEL (Etape)
+	- aller dans les seeders (database/seeders/DatabaseSeeder.php)
+	- écrire le code des seeders
+	- pusher dans la bdd => php artisan db:seed      
+	
+18- GATES AVEC LARAVEL
+	- aller dans app/Providers/AuthServiceProvider.php
+	- definir le/les Gate	
+		Ex: Gate::define('isAdmin', function($user){
+			    return $user->role == "admin";
+			});
+			
+19- Pour donner les privilège à une route, on ajoute middleware(can:gateDefini) à la route
+	Ex: Route::get('/gate', [App\Http\Controllers\AuthorizationController::class, 'index'])->name('gate.index')->middleware('can:isAdmin'); 
+	
+20- Créer un Policy ==> php artisan make:policy nomPolicy --model=Model
+	Ex: php artisan make:policy PostPolicy --model=Post
+	
+21- Pour créer sa propre page d'erreurs 404 et 500, il faut :
+	- créer un dossier "errors" dans "/resources/views"
+	- créer deux fichiers "404.blade.php" et "500.blade.php"
+	- écrire son code et styliser dans les fichiers
+	- dans ".env", faire APP_ENV=prod & APP_DEBUG=false
+	
+22- Pour customiser une application down, il faut: 
+	- créer un dossier "errors" dans "/resources/views"
+	- créer deux fichiers "503.blade.php"
+	- écrire son code et styliser dans les fichiers
+	- dans ".env", faire APP_ENV=prod & APP_DEBUG=false
+	
+23- Pour définir soit même le port de démarrage du projet ==> php artisan serve --port=3000	
+
+24- Pour voir la version de laravel utilisée dans le projet ==> php artisan --version
+
+25- Pour créer un composant livewire ==> php artisan make:livewire nomComposant
+	
