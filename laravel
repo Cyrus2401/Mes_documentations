@@ -1,7 +1,7 @@
 MOI PERSO QUAND JE DEMARRE UN PROJET LARAVEL 
 	- composer create-project laravel/laravel nomProjet ou composer create-project laravel/laravel:^8.0 nomProjet (pour spécifier la version de laravel) 
 	- aller dans le projet => cd nomProjet/
-	- composer require laravel/ui
+	- composer require laravel/ui ou composer require laravel/ui:^3.4 (compatible avec la version 8)
 	- php artisan ui bootstrap/vue/react --auth ==> (en fonction de ce que tu veux entre bootstrap ou vue ou react)
 	- npm install 
 	- npm run dev 
@@ -10,11 +10,11 @@ MOI PERSO QUAND JE DEMARRE UN PROJET LARAVEL
 	
 	****** SI JE VEUX UTILISER JQUERY 
 		- npm install jquery-ui --save-dev 
-		- // resources/assets/js/app.js
+		- // resources/js/app.js
 			import $ from 'jquery';
 			window.$ = window.jQuery = $;
 			import 'jquery-ui/ui/widgets/datepicker.js';//add as many widget as you may need
-		- // resources/assets/sass/app.scss
+		- // resources/sass/app.scss
 			@import '~jquery-ui/themes/base/all.css';
 	- npm install 
 	- npm run dev 
@@ -205,4 +205,6 @@ MOI PERSO QUAND JE DEMARRE UN PROJET LARAVEL
 24- Pour voir la version de laravel utilisée dans le projet ==> php artisan --version
 
 25- Pour créer un composant livewire ==> php artisan make:livewire nomComposant
+
+26- Captcha => https://www.nicesnippets.com/blog/laravel-8-captcha-code-tutorial
 	
