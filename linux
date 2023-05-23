@@ -86,7 +86,7 @@
 	ps -e : liste tous les processus existant sur le système 
 	
 	passwd : modifie le mot de passe d'un utilisateur
-		passwq userName
+		passwd userName
 		Ex: passwd cyrus (Change le mot de passe de 'cyrus')
 	
 	passwd -S userName : affiche des informations d'Etat sur le mot de passe de l'utilisateur

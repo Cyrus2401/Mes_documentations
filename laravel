@@ -124,7 +124,7 @@ MOI PERSO QUAND JE DEMARRE UN PROJET LARAVEL
 8- UTILISER BOOTSTRAP
 	- composer require laravel/ui
 	- php artisan
-	 ui bootstrap
+	- ui bootstrap
 	- npm install
 	- npm run 
 	
@@ -204,4 +204,19 @@ MOI PERSO QUAND JE DEMARRE UN PROJET LARAVEL
 25- Pour créer un composant livewire ==> php artisan make:livewire nomComposant
 
 26- Captcha => https://www.nicesnippets.com/blog/laravel-8-captcha-code-tutorial
+
+27- Exemple d'un moyen pour ranger toutes ces routes 
+	Route::group(['middleware' => ['auth']], function() {
+	    Route::get('/home', function(){ return view('home'); })->name('home');
+	    Route::get('/acceptProposal/{proposal}', [ProposalController::class, 'confirm'])->name('confirm.proposal');
+	    Route::get('/conversations', [ConversationController::class, 'index'])->name('conversation.index');
+	});
 	
+28- Ceci ne concerne pas seulemnt laravel mais tous les langages ; si vous ne pouvez pas truncate par exemple une table dûes aux clés secondaires, 
+	SET FOREIGN_KEY_CHECKS = 0;
+	TRUNCATE table1;
+	TRUNCATE table2;
+	SET FOREIGN_KEY_CHECKS = 1;
+	NB: Toutes ces commandes sont exécutées simultanément !
+	
+
