@@ -1,0 +1,14 @@
+- Amgular est un framework JS
+
+- TypeScript (.ts) est :
+    * un langage qui apporte des syntaxes supplémentaires au JavaScript
+    * un langage avec du typage strict
+    * l'un des langages principaux d'Angular
+
+- Pour crée une nouvelle application Angular : ng new appName
+    * --style=scss => permet de spécifier, lors de la création d'une application, que l'on souhaite utiliser le SCSS pour les styles
+    * --skip-tests=true => vous ne voulez pas générer de fichiers de tests unitaires pour ce projet
+    
+- Dans le fichier index.html, la balise  <app-root> correspond "Au component AppComponent"
+
+- Pour creer un component : ng generate component componentName
