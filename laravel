@@ -28,7 +28,7 @@ MOI PERSO QUAND JE DEMARRE UN PROJET LARAVEL
 		- php artisan vendor:publish --provider="Laravel\Fortify\FortifyServiceProvider"
 		- php artisan migrate
 		- ajouter "App\Providers\FortifyServiceProvider::class" dans 'config/app.php' => Provider
-		- aller dans "App\Providers\FortifyServiceProvider" et dans la function boot()
+		- aller dans "app\Providers\FortifyServiceProvider" et dans la function boot()
 			
 			use Laravel\Fortify\Fortify;
 			use App\Models\User;
@@ -47,9 +47,9 @@ MOI PERSO QUAND JE DEMARRE UN PROJET LARAVEL
 			});
 			
 			Fortify::registerView(function () {
-                return view('auth.register');
-            });
-			
+				return view('auth.register');
+		        });
+					
 	****** INSTALLER TAILWINDCSS 
 		- npm install -D tailwindcss@latest postcss@latest autoprefixer@latest
 		- npx tailwindcss init 
@@ -100,6 +100,12 @@ MOI PERSO QUAND JE DEMARRE UN PROJET LARAVEL
 	"author" est le nom du nouveau champs
 	"mangas" est le nom de la table
 	
+   Supprimer un champ au niveau de la table ==> php artisan make:migration remove_tel_column --table=nom_de_la_table
+   	Ensuite dans la migration ==> $table->dropColumn('tel');
+   	
+   Modifier un champ au niveau de la table ==> php artisan make:migration modify_nom_de_la_table
+   	Ensuite dans la migration ==> $table->renameColumn('old_field', 'new_field');
+	
 	
 4- Rendre les valeurs du champs unique : php artisan make:migration add_unique_constraint_on_email_in_users_table --table=users
 	"users" represente la table
@@ -113,10 +119,10 @@ MOI PERSO QUAND JE DEMARRE UN PROJET LARAVEL
 7- FIXTURES AVEC LARAVEL (Etape)
 	- Ecrire d'abord le code des fixtures (database/factories/UserFactory.php)
 	- Pour une nouvelle Factory ==> php artisan make:factory nomFactory
-	- Pour pouvoir envoyer les fixtures dans la BDD, entrer dans tinker avec ==> php artisan tinker
+	- Pour pouvoir envoyer les fixtures dans la BDD, entrer dans tinker avec ==> php artisan tinker	
 	- Pour envoyer les fixtures, 
 		Entity::factory()->count(nombre)->create();
-			'Entity' est le nom de l'entité
+			'Entity' est le nom de l'entité 
 			'nombre' est le nombre de fausse données que vous voulez ajouter dans la BDD
 			
 	* Une autre façon pour lancer les fixtures est d'aller dans "database/seeders/DatabaseSeeder.php" et faire
@@ -222,4 +228,4 @@ MOI PERSO QUAND JE DEMARRE UN PROJET LARAVEL
 	SET FOREIGN_KEY_CHECKS = 1;
 	NB: Toutes ces commandes sont exécutées simultanément !
 	
-
+29- La gestions des erreurs en langagues française se fait dans ressources/lang
