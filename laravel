@@ -214,6 +214,11 @@ MOI PERSO QUAND JE DEMARRE UN PROJET LARAVEL
 
 26- Captcha => https://www.nicesnippets.com/blog/laravel-8-captcha-code-tutorial
 
+27- Si le lien symbolique a disparu au niveau de public/storage	
+	- rm -rf public/storage
+	- php artisan storage:link
+
+
 27- Exemple d'un moyen pour ranger toutes ces routes 
 	Route::group(['middleware' => ['auth']], function() {
 	    Route::get('/home', function(){ return view('home'); })->name('home');
@@ -229,3 +234,36 @@ MOI PERSO QUAND JE DEMARRE UN PROJET LARAVEL
 	NB: Toutes ces commandes sont exécutées simultanément !
 	
 29- La gestions des erreurs en langagues française se fait dans ressources/lang
+
+30- On peut rajouter des conditions (regex) aux paramètres d'une url lorsqu'on défini la route
+	Route::get('/blog/{categorie}-{id}, function(string $categorie, string $id){
+		return [
+			"categorie" => $categorie,
+			"id" => $id
+		]
+	})->where([
+		"categorie" => '[0-9]+',
+		"id" => '[a-z0-9\-]+'
+	]);
+	
+31- On peut faire une requête et faire sortir des données paginées depuis la BDD 
+	$posts = Post::paginate(5); => 5 éléments par page
+
+32- l'attribut protégé $fillable est mis dans le model par sécurité pour ne pas qu'un invidividu qui connait nos tables dans la BDD ne passe directement par $request->all() pour envoyer dans la BDD dans la methode create()
+
+33- $fillable liste tous les champs qui peuvent reçevoir des données depuis notre formulaire ; son contraire est $guarded qui liste les champs qu'on ne peut donner d'informations.
+
+34- On peut faire un dump dans blade avec @dump($var)
+
+35- Pour la faire la pagiantion des elments du tableau, on fait dans la blade => {{ $posts->links() }}
+	* Par défaut, laravel utilise un style avec tailwind css pour afficher la pagination. Si vous désirez utiliser du bootstrap à la place, aller dans app/Providers/AppServiceProvider et dans la method boot(), ajouter Paginator::useBootstrapFive();
+	
+36- Laravel debugbar => un meilleur apperçu de notre système (Voir la documentation sur Github)
+37- Laravel IDE helper => un meilleur auto-completion de IDE avec laravel (Voir la documentation sur Github)
+
+38- Pour créer une table qui naît de deux autres tables (Many To Many), on écrit en miniscule au singulier chaque nom des tables suivant l'ordre alphabétique séparé par un underscore (_)
+
+39- Auth::attempt(['email' => $email, 'password' => $password]) => verifier si les données entrées lors du login sont correctes : renvoie un bool
+
+40- La directive @auth() de blade permet de voir si l'utilisateur est connecté. 
+41- La directive @guest() de blade permet de voir si l'utilisateur n'est pas connecté.
