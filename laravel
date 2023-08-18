@@ -100,6 +100,10 @@ MOI PERSO QUAND JE DEMARRE UN PROJET LARAVEL
 	"author" est le nom du nouveau champs
 	"mangas" est le nom de la table
 	
+	ou
+	
+	php artisan make:migration AddAuthorToMangas
+	
    Supprimer un champ au niveau de la table ==> php artisan make:migration remove_tel_column --table=nom_de_la_table
    	Ensuite dans la migration ==> $table->dropColumn('tel');
    	
@@ -194,6 +198,9 @@ MOI PERSO QUAND JE DEMARRE UN PROJET LARAVEL
 20- Créer un Policy ==> php artisan make:policy nomPolicy --model=Model
 	Ex: php artisan make:policy PostPolicy --model=Post
 	
+	- Ecrire sa fonction 
+	- Aller dans app/Providers/AuthServiceProvider.php et définir le model et sa policy
+	
 21- Pour créer sa propre page d'erreurs 404 et 500, il faut :
 	- créer un dossier "errors" dans "/resources/views"
 	- créer deux fichiers "404.blade.php" et "500.blade.php"
@@ -267,3 +274,26 @@ MOI PERSO QUAND JE DEMARRE UN PROJET LARAVEL
 
 40- La directive @auth() de blade permet de voir si l'utilisateur est connecté. 
 41- La directive @guest() de blade permet de voir si l'utilisateur n'est pas connecté.
+
+42- SYSTEME DE SCOPE
+	=> Dans le model (précédé le nom de "scope")
+		public function scopeAvailable(Builder $builder): Builder {
+			return $builder->where('status', 1);
+		}
+	
+	=> La requête dans le controller
+		$user = User::Available()->get();
+		
+43- On peut créer des composants avec laravel : php artisan make:component Component
+	- un fichier est crée dans App/View/Components/component.php qui contient une fonction qui redirige vers une vue
+	- Poour appeler la vue de ce component, on x-nomComponent
+		Ex: <x-component></x-component>
+		
+44- SYSTEME DE NOTIFICATION
+	- php artisan make:notification helloNotification
+	- Pour envoyer la notification :
+		* $user = User::find(1)
+		* $user->notify(new helloNotification($Post(le model du controller), $users)) 
+		
+45- langues : php require laravel-lang --common=dev --ignore-platform-reqs
+		 
