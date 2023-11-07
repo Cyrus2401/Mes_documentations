@@ -81,7 +81,39 @@ MOI PERSO QUAND JE DEMARRE UN PROJET LARAVEL
 			Alpine.start()
 		- appeler alpine dans le head du blade
 			 <script src="{{ asset('js/app.js') }}" defer></script>
-		- npm run dev 
+		- npm run dev
+		
+	****** SI webpack n'est pas disponible
+		- npm install --save-dev laravel-mix
+		- créer le fichier "webpack" et y introduire ce bout de code
+			const mix = require('laravel-mix');
+			/*
+			 |--------------------------------------------------------------------------
+			 | Mix Asset Management
+			 |--------------------------------------------------------------------------
+			 |
+			 | Mix provides a clean, fluent API for defining some Webpack build steps
+			 | for your Laravel applications. By default, we are compiling the CSS
+			 | file for the application as well as bundling up all the JS files.
+			 |
+			 */
+			mix.js('resources/js/app.js', 'public/js')
+			    .postCss('resources/css/app.css', 'public/css', [
+				//
+			    ]); 
+		- modifier "package.json"
+			  "scripts": {
+				-     "dev": "vite",
+				-     "build": "vite build"
+				+     "dev": "npm run development",
+				+     "development": "mix",
+				+     "watch": "mix watch",
+				+     "watch-poll": "mix watch -- --watch-options-poll=1000",
+				+     "hot": "mix watch --hot",
+				+     "prod": "npm run production",
+				+     "production": "mix --production"
+	  	            }
+  	      	- npm pkg delete type
 		
 	
 1- Créer une migration et un model en même temps ==> php artisan make:model Mangas -m
@@ -262,7 +294,7 @@ MOI PERSO QUAND JE DEMARRE UN PROJET LARAVEL
 
 34- On peut faire un dump dans blade avec @dump($var)
 
-35- Pour la faire la pagiantion des elments du tableau, on fait dans la blade => {{ $posts->links() }}
+35- Pour la faire la pagination des éléments du tableau, on fait dans la blade => {{ $posts->links() }}
 	* Par défaut, laravel utilise un style avec tailwind css pour afficher la pagination. Si vous désirez utiliser du bootstrap à la place, aller dans app/Providers/AppServiceProvider et dans la method boot(), ajouter Paginator::useBootstrapFive();
 	
 36- Laravel debugbar => un meilleur apperçu de notre système (Voir la documentation sur Github)
