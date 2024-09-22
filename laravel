@@ -302,7 +302,13 @@ MOI PERSO QUAND JE DEMARRE UN PROJET LARAVEL
 
 38- Pour créer une table qui naît de deux autres tables (Many To Many), on écrit en miniscule au singulier chaque nom des tables suivant l'ordre alphabétique séparé par un underscore (_)
 
-39- Auth::attempt(['email' => $email, 'password' => $password]) => verifier si les données entrées lors du login sont correctes : renvoie un bool
+39- AUTHENTIFICATION
+	- php artisan make:request LoginRequest
+		public function authorize()
+		{
+		    return true;
+		}
+	- Auth::attempt(['email' => $email, 'password' => $password]) => verifier si les données entrées lors du login sont correctes : renvoie un bool
 
 40- La directive @auth() de blade permet de voir si l'utilisateur est connecté. 
 41- La directive @guest() de blade permet de voir si l'utilisateur n'est pas connecté.
@@ -328,4 +334,24 @@ MOI PERSO QUAND JE DEMARRE UN PROJET LARAVEL
 		* $user->notify(new helloNotification($Post(le model du controller), $users)) 
 		
 45- langues : php require laravel-lang --common=dev --ignore-platform-reqs
-		 
+
+46- Mettre webpack.mix.js dans un projet laravel 10  
+	https://github.com/laravel/vite-plugin/blob/main/UPGRADE.md#migrating-from-vite-to-laravel-mix
+	
+47 - Les "where" dans la requête eloquent
+	- $query = Model::where('column', '=', 'value')->get();
+	- $query = Model::where('column', '=', 'value')->orWhere('another_column', '=', 'another_value')->get();
+	- $query = Model::whereBetween('column', [1, 100])->get();
+	- $query = Model::whereNotBetween('column', [1, 100])->get();
+	- $query = Model::whereIn('column', [1, 2, 3])->get();
+	- $query = Model::whereNotIn('column', [1, 2, 3])->get();
+	- $query = Model::whereNull('column')->get();
+	- $query = Model::whereNotNull('column')->get();
+	- $query = Model::whereDate('created_at', '=', '2019-01-01')->get();
+	- $query = Model::whereMonth('created_at', '=', 1)->get();
+	- $query = Model::whereDay('created_at', '=', 15)->get();
+	- $query = Model::whereYear('created_at', '=', 2020)->get();
+	- $query = Model::whereColumn('first_name', 'last_name')->get();
+
+48 - $employees = Employee::orderByRaw('MONTH(birthday), DAY(birthday)')->get(); => Cela peut être utile si vous voulez trier par mois et jour indépendamment de l'année, par exemple.
+	 
