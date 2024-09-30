@@ -354,4 +354,20 @@ MOI PERSO QUAND JE DEMARRE UN PROJET LARAVEL
 	- $query = Model::whereColumn('first_name', 'last_name')->get();
 
 48 - $employees = Employee::orderByRaw('MONTH(birthday), DAY(birthday)')->get(); => Cela peut être utile si vous voulez trier par mois et jour indépendamment de l'année, par exemple.
-	 
+
+49 - INTEGRATION DE MONGODB AU PROJET LARAVEL 
+    => Installer mongoDb sur la machine 
+    => Installer mongoDb Compass pour le GUI (ou autre)
+    => sudo apt install php-mongodb
+    => Integrer mongoDb au projet laravel  (https://www.mongodb.com/resources/products/compatibilities/mongodb-laravel-integration)
+    => composer require jenssegers/mongodb
+    => Jenssegers\Mongodb\MongodbServiceProvider::class, (dans les provider de config/app.php)
+	=> .env
+        DB_CONNECTION=mongodb
+        DB_HOST=127.0.0.1
+        DB_PORT=27017
+        DB_DATABASE=5m5G@teW@y-db
+        DB_USERNAME=
+        DB_PASSWORD=
+        DB_URI=mongodb://localhost:27017
+    => Dans le model, importer (use Jenssegers\Mongodb\Eloquent\Model;) //commenter l'autre importation du Model qui est pour mysql
