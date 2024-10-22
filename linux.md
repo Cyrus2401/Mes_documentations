@@ -53,6 +53,15 @@ rm -r [dossier]           # Supprime un dossier et son contenu
 rm -i                     # Demande confirmation avant suppression
 ```
 
+### Copie Serveur vers PC & PC vers Serveur
+```bash
+# Copie du serveur vers le PC (à exécuter sur le PC ou sur le serveur)
+scp -r usernameServer@ipServer:/chemin/sur/serveur /chemin/sur/PC
+
+# Copie du PC vers le serveur (à exécuter sur le PC)
+scp -r /chemin/sur/PC usernameServer@ipServer:/chemin/sur/serveur
+```
+
 ## Gestion des Utilisateurs et Permissions
 
 ### Utilisateurs et Groupes
