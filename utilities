@@ -3,3 +3,13 @@
 2- Prefixes MOOV : 55 - 58 - 60 - 63 - 64 - 65 - 68 - 94 - 95 - 98 - 99
 
 3- Prefixes Celtiis : 40 - 41 - 43 - 44
+
+4- Copie du server vers PC (sur le Server) : scp -r pathOnServer usernamePC@ipPC:pathFinalPC
+
+5- Copie du PC au server (sur le PC) : scp -r pathOnPC usernameServer@ipServer:pathFinalServer
+
+5. 5 dépôts GitHub pour les développeurs => https://www.linkedin.com/posts/achille-mbougueng-6271a11b_top-5-d%C3%A9p%C3%B4ts-github-pour-les-d%C3%A9veloppeurs-activity-7244607485934727168-OU4L/?utm_source=share&utm_medium=member_android
+
+6. 10 API gratuites pour avancer rapidement dans vos projets => https://www.linkedin.com/posts/achille-mbougueng-6271a11b_10-api-gratuites-pour-avancer-rapidement-activity-7239903419228991489-Nx-R/?utm_source=share&utm_medium=member_android
+
+

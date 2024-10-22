@@ -371,3 +371,9 @@ MOI PERSO QUAND JE DEMARRE UN PROJET LARAVEL
         DB_PASSWORD=
         DB_URI=mongodb://localhost:27017
     => Dans le model, importer (use Jenssegers\Mongodb\Eloquent\Model;) //commenter l'autre importation du Model qui est pour mysql
+    
+50. 12 Top Security Best Practices for Your Laravel Application => https://saasykit.com/blog/12-top-security-best-practices-for-your-laravel-application?utm_source=laravelnews&utm_medium=link&utm_campaign=laravelnews
+
+51. Building a Multi-Role CMS with Custom Policies in Laravel 11 => https://techsolutionstuff.com/post/building-a-multi-role-cms-with-custom-policies-in-laravel-11?utm_source=laravelnews&utm_medium=link&utm_campaign=laravelnews
+
+52. How to Generate Documentation for Your Laravel Project => https://saasykit.com/blog/how-to-generate-documentation-for-your-laravel-project?utm_source=laravelnews&utm_medium=link&utm_campaign=laravelnews
