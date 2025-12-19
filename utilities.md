@@ -14,5 +14,3 @@
 - [10 API gratuites pour avancer rapidement dans vos projets](https://www.linkedin.com/posts/achille-mbougueng-6271a11b_10-api-gratuites-pour-avancer-rapidement-activity-7239903419228991489-Nx-R/?utm_source=share&utm_medium=member_android)
 
 - [Projet test : créer une application de traduction vocale](https://learn.microsoft.com/fr-fr/training/modules/challenge-project-build-speech-translator-app/?WT.mc_id=studentamb_372907)
-
-- Lancer Postman GUI => /opt/Postman/Postman &

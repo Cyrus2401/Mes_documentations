@@ -1,3 +1,0 @@
-- *type coercion* 
-
-- *POO JS*
