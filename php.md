@@ -278,3 +278,67 @@ php-fpm8.2 -t
 # Redémarrer PHP-FPM
 systemctl restart php8.2-fpm
 ```
+
+## Écosystème Modern & Outils
+
+### Composer (Gestionnaire de dépendances)
+Indispensable pour tout projet PHP moderne.
+```bash
+composer init                        # Initialiser un projet (crée composer.json)
+composer require vendor/package      # Installer une librairie
+composer require vendor/package --dev # Installer une dépendance de dév (tests, etc.)
+composer install                     # Installer les dépendances du composer.lock
+composer update                      # Mettre à jour les dépendances (selon composer.json)
+composer dump-autoload -o            # Optimiser l'autoloader (pour la prod)
+```
+
+### Nouveautés PHP 8+ (À connaître)
+```php
+// 1. Named Arguments (PHP 8.0)
+// Plus besoin de respecter l'ordre ou de mettre null pour les optionnels
+htmlspecialchars($string, double_encode: false);
+
+// 2. Match Expression (PHP 8.0)
+// Version améliorée et plus stricte du switch
+$status = match($code) {
+    200, 300 => 'success',
+    400, 500 => 'error',
+    default => 'unknown',
+};
+
+// 3. Nullsafe Operator (PHP 8.0)
+// Évite les erreurs "Call to member function on null"
+$country = $session?->user?->getAddress()?->country;
+
+// 4. Enums (PHP 8.1)
+enum Status: string {
+    case DRAFT = 'draft';
+    case PUBLISHED = 'published';
+}
+```
+
+### Outils de Qualité de Code (Static Analysis)
+Ces outils sont exécutés via la CLI pour garantir un code propre.
+
+```bash
+# PHP CS Fixer : Formate votre code selon les standards (PSR-12)
+vendor/bin/php-cs-fixer fix src/
+
+# PHPStan / Psalm : Analyse statique (trouve les bugs sans exécuter le code)
+vendor/bin/phpstan analyse src/ --level=max
+
+# Rector : Mise à jour automatique de votre code (ex: upgrade PHP 7.4 -> 8.2)
+vendor/bin/rector process src/
+```
+
+### Configuration PHP.ini critique (Production)
+```ini
+memory_limit = 256M           ; Suffisant pour la plupart des apps web
+upload_max_filesize = 64M     ; Selon vos besoins d'upload
+post_max_size = 64M           ; Doit être >= upload_max_filesize
+max_execution_time = 30       ; Éviter les processus infinis
+expose_php = Off              ; Masquer la version de PHP (Sécurité)
+display_errors = Off          ; Jamais d'erreurs à l'écran en PROD
+log_errors = On               ; Toujours loguer les erreurs
+error_log = /var/log/php_errors.log
+```

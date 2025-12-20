@@ -354,3 +354,50 @@ apt search terme              # Recherche un paquet
 ```
 
 > **Note :** Pour les systèmes RPM (Fedora/RHEL), remplacez `apt` par `dnf`.
+
+## Commandes Avancées & Réseau
+
+### Analyse Réseau & DNS
+```bash
+dig domaine.com              # Interroger les DNS (plus complet que nslookup)
+nslookup domaine.com         # Interroger les DNS (simple)
+traceroute google.com        # Voir le chemin des paquets réseau
+lsof -i :80                  # Voir quel processus utilise le port 80
+netstat -tulpn               # Lister les ports en écoute (TCP/UDP)
+```
+
+### Surveillance Système Avancée
+```bash
+htop                         # Moniteur système coloré et interactif (mieux que top)
+uptime                       # Temps de fonctionnement et charge système (load average)
+lsof -p [PID]                # Lister les fichiers ouverts par un processus
+vmstat 1                     # Statistiques mémoire/cpu en temps réel (chaque seconde)
+iostat                       # Statistiques d'entrées/sorties disque
+free -m                      # Afficher la mémoire en Mo
+```
+
+### Traitement de Texte (Sed & Awk)
+```bash
+# Sed (Éditeur de flux)
+sed 's/ancien/nouveau/g' fichier.txt   # Remplacer du texte (affichage seulement)
+sed -i 's/ancien/nouveau/g' fichier.txt # Remplacer directement dans le fichier
+
+# Awk (Traitement de données)
+awk '{print $1}' fichier.txt            # Afficher la première colonne
+awk -F":" '{print $1}' /etc/passwd      # Afficher les utilisateurs (séparateur :)
+```
+
+### Gestion SSH
+```bash
+ssh-keygen -t ed25519                   # Générer une paire de clés SSH moderne
+ssh-copy-id user@serveur                # Copier sa clé publique sur un serveur
+ssh user@serveur -p 2222                # Se connecter sur un port spécifique
+```
+
+### Sécurité Rapide
+```bash
+last                                    # Voir les dernières connexions
+who                                     # Voir qui est connecté actuellement
+sudo ufw status                         # Voir l'état du pare-feu (Ubuntu)
+sudo ufw allow 80/tcp                   # Ouvrir le port 80
+```

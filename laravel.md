@@ -1,562 +1,247 @@
-# Guide Laravel : Installation et Configuration
+# Guide Laravel : Référence Rapide
 
-## Table des matières
-- [Démarrage d'un projet](#démarrage-dun-projet)
-- [Architecture et Concepts](#architecture-et-concepts)
-- [Migrations et Base de données](#migrations-et-base-de-données)
-- [Authentification et Sécurité](#authentification-et-sécurité)
-- [Organisation de la Logique Métier](#organisation-de-la-logique-métier)
-- [Fonctionnalités avancées](#fonctionnalités-avancées)
-- [API Resources](#api-resources)
-- [Commandes utiles](#commandes-utiles)
-- [Bonnes pratiques](#bonnes-pratiques)
-- [Artisan et CLI](#artisan-et-cli)
-- [Gestion des erreurs](#gestion-des-erreurs)
-- [Performance et Optimisation](#performance-et-optimisation)
-- [Tests](#tests)
-- [Déploiement](#déploiement)
+## Création de projet : webapp & api
 
-
-## Démarrage d'un projet
-
-### Création d'un nouveau projet
+### Création de projet
 ```bash
-# Installation basique via Composer
+# Créer un nouveau projet Laravel complet (WebApp & API)
+# C'est la commande standard pour tout type de projet.
 composer create-project laravel/laravel nom-projet
 
-# Installation via Laravel Installer
+# Via l'installateur global Laravel (Alternative plus rapide)
 laravel new nom-projet
 
-# Installation avec version spécifique
-composer create-project laravel/laravel:^10.0 nom-projet
+# Installation spécifique pour API (Laravel 11+)
+# Laravel est "API ready" par défaut, mais pour installer les fichiers de route API :
+php artisan install:api
 
-cd nom-projet
-```
-
-## Architecture et Concepts
-
-### Cycle de vie d'une requête (Simplifié)
-1.  **Entrée** : `public/index.php`
-2.  **Kernel** : Chargement du framework et des composants de base.
-3.  **Service Providers** : Bootstrapping de l'application (Base de données, Routes, etc.).
-4.  **Middleware** : Filtrage de la requête (Auth, CSRF).
-5.  **Contrôleur** : Traitement de la demande.
-6.  **Sortie** : Renvoi de la réponse (Vue ou JSON).
-
-### Service Container et Providers
-Le Service Container gère l'injection de dépendances.
-```php
-// Binding dans un ServiceProvider
-$this->app->bind(PaymentGateway::class, function ($app) {
-    return new StripePaymentGateway(config('services.stripe.secret'));
-});
-
-// Injection automatique dans un contrôleur
-public function store(PaymentGateway $paymentGateway) {
-    // ...
-}
-```
-
-## Migrations et Base de données
-
-### Commandes de base
-```bash
-# Créer une migration et un modèle
-php artisan make:model NomModel -m
-
-# Créer migration, modèle et contrôleur
-php artisan make:model NomModel -mc
-
-# Exécuter les migrations
-php artisan migrate                    # Migration standard
-php artisan migrate:fresh              # Réinitialiser et migrer
-php artisan migrate:refresh            # Rafraîchir sans truncate
-php artisan migrate:rollback           # Annuler dernière migration
-php artisan migrate:rollback --step=1  # Revenir à une étape spécifique
-```
-
-### Modifications de table
-```bash
-# Ajouter une colonne
-php artisan make:migration add_field_to_table_name --table=table_name
-
-# Supprimer une colonne
-php artisan make:migration remove_field_from_table_name --table=table_name
-
-# Modifier une colonne
-php artisan make:migration modify_table_name
-```
-
-## Authentification et Sécurité
-
-Il existe plusieurs méthodes pour gérer l'authentification dans Laravel.
-
-### 1. Laravel Breeze (Recommandé pour débuter)
-Un starter kit simple et léger incluant Login, Register, Password Reset.
-```bash
-composer require laravel/breeze --dev
-php artisan breeze:install
-php artisan migrate
+# Installation des dépendances après un clonage Git
+composer install
 npm install && npm run dev
-```
-
-### 2. Laravel Sanctum (Pour API et SPA)
-Le standard pour authentifier des APIs ou des applications Vue/React.
-```bash
-composer require laravel/sanctum
-php artisan vendor:publish --provider="Laravel\Sanctum\SanctumServiceProvider"
-```
-
-Utilisation (Token API) :
-```php
-// Créer un token
-$token = $user->createToken('token-name')->plainTextToken;
-
-// Routes protégées (api.php)
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
-```
-
-### 3. Laravel Fortify (Backend Only)
-Moteur d'authentification sans interface graphique (Headless).
-```bash
-composer require laravel/fortify
-php artisan vendor:publish --provider="Laravel\Fortify\FortifyServiceProvider"
-php artisan migrate
-```
-
-Configuration dans `config/app.php`:
-```php
-'providers' => [
-    // ...
-    App\Providers\FortifyServiceProvider::class,
-];
-```
-
-### Gates et Policies (Autorisation)
-Gérez les permissions utilisateur.
-```php
-// Dans AuthServiceProvider.php
-Gate::define('isAdmin', function($user) {
-    return $user->role == "admin";
-});
-
-// Création d'une Policy liée à un modèle
-php artisan make:policy PostPolicy --model=Post
-```
-
-Exemple de Policy :
-```php
-public function update(User $user, Post $post) {
-    return $user->id === $post->user_id;
-}
-```
-
-Usage : `$this->authorize('update', $post);`
-
-## Organisation de la Logique Métier
-
-Pour éviter les "Fat Controllers", séparez votre logique.
-
-### Service Classes
-Pour regrouper la logique métier complexe.
-```php
-// App/Services/OrderService.php
-class OrderService {
-    public function placeOrder(User $user, array $items) {
-        // Logique de calcul, stock, paiement...
-    }
-}
-```
-
-### Actions (Single Action Classes)
-Une classe par action, très lisible.
-```bash
-php artisan make:action CreateUserAction
-```
-```php
-class CreateUserAction {
-    public function execute(array $data): User {
-        return DB::transaction(function() use ($data) {
-            return User::create($data);
-        });
-    }
-}
-```
-
-## Fonctionnalités avancées
-
-### Fixtures et Seeders
-```bash
-# Créer une Factory
-php artisan make:factory NomFactory
-
-# Exécuter via Tinker
-php artisan tinker
-Model::factory()->count(nombre)->create();
-
-# Ou via Seeder
-php artisan db:seed
-php artisan db:seed --class=UserSeeder
-```
-
-### Observers
-Écouter les événements d'un modèle (created, updated, deleted).
-```bash
-php artisan make:observer UserObserver --model=User
-```
-
-### Notifications
-```bash
-php artisan make:notification NomNotification
-
-# Envoyer une notification
-$user->notify(new NomNotification($data));
-```
-
-### Internationalisation
-```bash
-composer require laravel-lang/common --dev
-```
-
-### MongoDB Integration
-```bash
-sudo apt install php-mongodb
-composer require jenssegers/mongodb
-
-# Configuration .env
-DB_CONNECTION=mongodb
-DB_HOST=127.0.0.1
-DB_PORT=27017
-DB_DATABASE=nom_base
-```
-
-## API Resources
-
-Transformez vos modèles en réponses JSON formatées.
-
-```bash
-php artisan make:resource UserResource
-```
-
-```php
-// UserResource.php
-public function toArray($request)
-{
-    return [
-        'id' => $this->id,
-        'name' => $this->name,
-        'email' => $this->email,
-        'created_at' => $this->created_at->format('d/m/Y'),
-        'posts' => PostResource::collection($this->whenLoaded('posts')),
-    ];
-}
-```
-
-Usage dans le contrôleur :
-```php
-return new UserResource(User::find(1));
-return UserResource::collection(User::all());
-```
-
-## Commandes utiles
-
-### Maintenance
-```bash
-php artisan down  # Mode maintenance (site inaccessible)
-php artisan down --secret="1630542a-246b-4b66-afa1-dd72a4c43515" # Maintenance avec accès bypass
-php artisan up    # Quitter mode maintenance
-```
-
-### Nettoyage et Cache
-```bash
-php artisan optimize:clear # Vider tous les caches
-php artisan config:cache   # Mettre en cache la config (PROD)
-php artisan route:list     # Lister toutes les routes
-```
-
-### Storage
-```bash
-php artisan storage:link  # Créer lien symbolique public -> storage
 ```
 
 ### Serveur de développement
 ```bash
-php artisan serve --port=3000  # Démarrer sur port spécifique
+# Lancer le serveur de développement local
+php artisan serve
+
+# Lancer le serveur sur un port spécifique (ex: 8080)
+php artisan serve --port=8080
+```
+
+## Commandes de base
+
+### Génération de Code (Make)
+Utilisez ces commandes pour créer rapidement les composants de votre application.
+
+```bash
+# Créer un Modèle Eloquent (Représentation d'une table BDD)
+php artisan make:model Product
+
+# Créer un Modèle + Fichier de Migration associé
+php artisan make:model Product -m
+
+# Créer un Modèle + Migration + Contrôleur
+php artisan make:model Product -mc
+
+# Créer la totale : Modèle, Migration, Contrôleur Resource, Requests, Policy
+php artisan make:model Product --all
+
+# Créer un Contrôleur (Gère la logique HTTP)
+php artisan make:controller ProductController
+
+# Créer un Contrôleur de type "Resource" (avec méthodes index, create, store...)
+php artisan make:controller ProductController --resource
+
+# Créer une Vue Blade (Template HTML)
+php artisan make:view products.index
+
+# Créer une FormRequest (Validation des données entrantes)
+php artisan make:request StoreProductRequest
+
+# Créer un Middleware (Filtrage des requêtes HTTP)
+php artisan make:middleware EnsureIsAdmin
+
+# Créer une Policy (Gestion des autorisations utilisateur)
+php artisan make:policy ProductPolicy
+
+# Créer un Seeder (Remplissage de la BDD avec des données)
+php artisan make:seeder ProductsSeeder
+
+# Créer une Factory (Génération de fausses données pour tests)
+php artisan make:factory ProductFactory
+
+# Créer un Observer (Écoute les événements d'un modèle : created, updated...)
+php artisan make:observer ProductObserver
+
+# Créer une Commande Artisan personnalisée
+php artisan make:command SendEmails
+
+# Créer un Job (Tâche de fond pour les files d'attente)
+php artisan make:job ProcessOrder
+
+# Créer une classe Mailable (Pour l'envoi d'emails)
+php artisan make:mail OrderShipped
+
+# Créer une Notification (Email, SMS, Slack...)
+php artisan make:notification InvoicePaid
+
+# Créer une API Resource (Transformation de modèles en JSON)
+php artisan make:resource ProductResource
+
+# Créer un Test (Pest ou PHPUnit)
+php artisan make:test UserTest
+```
+
+### Modifications de table
+
+#### Gestion des Migrations
+```bash
+# Créer un fichier de migration pour créer une table
+php artisan make:migration create_products_table
+
+# Créer un fichier de migration pour modifier une table existante
+php artisan make:migration add_votes_to_users_table --table=users
+
+# Exécuter les migrations en attente (Mise à jour de la BDD)
+php artisan migrate
+
+# Annuler (Rollback) la dernière migration exécutée
+php artisan migrate:rollback
+
+# Tout supprimer et tout relancer (Reset complet de la BDD)
+php artisan migrate:fresh
+
+# Rafraîchir les migrations (Rollback tout + Migrate)
+php artisan migrate:refresh
+
+# Rafraîchir et relancer les seeders (Idéal pour reset en dev)
+php artisan migrate:refresh --seed
+```
+
+#### Exemples de Schema Builder
+À utiliser dans la méthode `up()` de vos fichiers de migration.
+
+```php
+// Création de table
+Schema::create('users', function (Blueprint $table) {
+    $table->id();                                   // Auto-increment primary key
+    $table->string('name');                         // VARCHAR(255)
+    $table->string('email')->unique();              // VARCHAR avec index unique
+    $table->text('bio')->nullable();                // TEXT, autorise NULL
+    $table->boolean('is_active')->default(true);    // BOOL avec valeur par défaut
+    $table->foreignId('role_id')->constrained();    // Clé étrangère vers 'roles'
+    $table->timestamps();                           // created_at et updated_at
+});
+
+// Modification de table
+Schema::table('users', function (Blueprint $table) {
+    $table->string('phone')->after('email');        // Ajouter colonne après une autre
+    $table->dropColumn('bio');                      // Supprimer colonne
+    $table->string('name', 100)->change();          // Modifier type/taille (requiert doctrine/dbal)
+    $table->renameColumn('from', 'to');             // Renommer
+});
+```
+
+## Commandes utiles
+
+### Maintenance & Système
+```bash
+# Mode maintenance
+php artisan down
+php artisan down --secret="mon-secret" # Avec accès bypass
+php artisan up                         # Sortir du mode maintenance
+
+# Cache & Optimisation
+php artisan optimize        # Cache config, routes, etc.
+php artisan optimize:clear  # Vider tous les caches
+php artisan cache:clear     # Vider cache application
+php artisan config:clear    # Vider cache config
+php artisan route:clear     # Vider cache routes
+php artisan view:clear      # Vider cache vues
+```
+
+### Base de données
+```bash
+php artisan db:seed                     # Lancer tous les seeders
+php artisan db:seed --class=UserSeeder  # Lancer un seeder spécifique
+php artisan db:wipe                     # Supprimer toutes les tables
+```
+
+### Utility & Debug
+```bash
+# Lister les routes enregistrées
+php artisan route:list
+php artisan route:list --path=api    # Filtrer par URL
+
+# Console interactive PHP avec contexte Laravel
+php artisan tinker
+
+# Générer clé d'application (après clonage)
+php artisan key:generate
+
+# Créer le lien symbolique public/storage -> storage/app/public
+php artisan storage:link
+
+# Publier les assets des packages
+php artisan vendor:publish
+```
+
+### Authentification (Starter Kits)
+```bash
+# Breeze (Recommandé débutants)
+php artisan breeze:install
+
+# Sanctum (API Tokens)
+php artisan vendor:publish --provider="Laravel\Sanctum\SanctumServiceProvider"
 ```
 
 ## Bonnes pratiques
 
-### Validation avec FormRequests
-Ne validez **jamais** dans le contrôleur. Utilisez une classe dédiée.
-```bash
-php artisan make:request StorePostRequest
-```
-
-```php
-public function rules()
-{
-    return [
-        'title' => 'required|max:255',
-        'body' => 'required',
-    ];
-}
-
-// Controller
-public function store(StorePostRequest $request)
-{
-    $validated = $request->validated();
-    // ...
-}
-```
-
-### Enums (PHP 8.1+)
-```php
-enum UserStatus: string {
-    case ACTIVE = 'active';
-    case INACTIVE = 'inactive';
-}
-
-// Model
-protected $casts = [
-    'status' => UserStatus::class,
-];
-```
-
-### Gestion des routes
-Utilisez le nommage et le groupement.
-```php
-Route::group(['middleware' => ['auth']], function() {
-    Route::get('/home', [HomeController::class, 'index'])->name('home');
-    // autres routes...
-});
-```
-
-### Requêtes Eloquent courantes
-```php
-// Exemples de where
-Model::where('column', '=', 'value')->get();
-Model::whereBetween('column', [1, 100])->get();
-Model::whereIn('column', [1, 2, 3])->get();
-Model::whereNull('column')->get();
-Model::whereDate('created_at', '=', '2019-01-01')->get();
-
-// Scopes (Méthodes réutilisables)
-// Dans le modèle : scopeActive($query) { return $query->where('active', 1); }
-User::active()->get();
-
-// Pagination
-$posts = Post::paginate(5);
-```
-
-### Sécurité
-- Utilisez toujours les variables `$fillable` ou `$guarded` dans les modèles.
-- Activez CSRF protection.
-- Configurez correctement les headers de sécurité.
-
-## Artisan et CLI
-
-### Commandes personnalisées
-```bash
-# Créer une nouvelle commande
-php artisan make:command NomCommande
-
-# Structure de base d'une commande
-php artisan make:command SendEmails --command=emails:send
-```
-
-Exemple de commande personnalisée:
-```php
-class SendEmails extends Command
-{
-    protected $signature = 'emails:send {user} {--queue}';
-    protected $description = 'Envoyer des emails aux utilisateurs';
-
-    public function handle()
-    {
-        $userId = $this->argument('user');
-        $queue = $this->option('queue');
-        // Logique de la commande
-    }
-}
-```
-
-### Tâches planifiées (Scheduler)
-Dans `app/Console/Kernel.php`:
-```php
-protected function schedule(Schedule $schedule)
-{
-    // Exécuter toutes les minutes
-    $schedule->command('emails:send')->everyMinute();
-    
-    // Exécuter tous les jours à minuit
-    $schedule->command('backup:clean')->daily();
-    
-    // Callback Closure
-    $schedule->call(function () {
-        DB::table('recent_users')->delete();
-    })->daily();
-}
-```
-
-Configuration Cron serveur :
-```bash
-* * * * * cd /path-to-project && php artisan schedule:run >> /dev/null 2>&1
-```
-
-## Gestion des erreurs
-
-### Pages d'erreur personnalisées
-```bash
-# Créer les vues d'erreur dans resources/views/errors/
-404.blade.php
-500.blade.php
-503.blade.php
-```
-
-### Logging
-```php
-// Dans un controller
-use Illuminate\Support\Facades\Log;
-
-Log::info('User login', ['id' => $user->id]);
-Log::error('Something happened');
-```
-
-Configuration dans `config/logging.php` (Stack, Daily, Slack, etc.).
-
-### Exceptions personnalisées
-```php
-class CustomException extends Exception
-{
-    public function report()
-    {
-        Log::error('Une erreur personnalisée est survenue');
-    }
-
-    public function render($request)
-    {
-        return response()->view('errors.custom', [], 500);
-    }
-}
-```
+*   **Validation** : Ne validez jamais dans le contrôleur. Utilisez des **FormRequests** (`php artisan make:request`) pour séparer la logique de validation.
+    ```php
+    public function rules() { return ['title' => 'required|max:255']; }
+    ```
+*   **Contrôleurs minces** : Déportez la logique métier complexe dans des **Service Classes** ou des **Actions**. Le contrôleur ne doit que passer des données.
+*   **Eloquent** :
+    *   Utilisez `$fillable` dans vos modèles pour éviter les failles Mass Assignment.
+    *   Utilisez des **Scopes** pour les requêtes réutilisables (`scopeActive($query)`).
+    *   Utilisez le **Eager Loading** (`User::with('posts')->get()`) pour éviter le problème N+1 requêtes.
+*   **DRY (Don't Repeat Yourself)** : Utilisez les **Model Factories** pour vos tests et seeders au lieu de créer des objets manuellement.
+*   **Sécurité** :
+    *   Échappez toujours les sorties (`{{ $var }}` dans Blade le fait automatiquement).
+    *   Utilisez les **Policies** ou **Gates** pour l'autorisation (`$this->authorize('update', $post)`).
+*   **Configuration** : Utilisez toujours `config('dossier.cle')` pour accéder aux valeurs, jamais `env()` en dehors des fichiers de config.
 
 ## Performance et Optimisation
 
-### Cache
-```bash
-# Configuration du cache
-php artisan cache:clear
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
+### Production Checklist
+1.  **Dépendances** : `composer install --optimize-autoloader --no-dev`
+2.  **Caches** :
+    ```bash
+    php artisan config:cache
+    php artisan route:cache
+    php artisan view:cache
+    ```
+    *Note : Une fois `config:cache` exécuté, la fonction `env()` ne renvoie plus rien. Utilisez `config()`.*
 
-# Redis
-composer require predis/predis
+### Queues (Files d'attente)
+Déchargez les tâches longues (emails, traitement d'image) vers les queues.
+```bash
+# Lancer le worker
+php artisan queue:work --tries=3
 ```
 
-Configuration dans `.env`:
+### Base de données
+*   Indexez vos colonnes fréquemment recherchées dans les migrations.
+*   Utilisez `chunk()` pour traiter de grands volumes de données.
+    ```php
+    User::chunk(100, function ($users) { foreach ($users as $user) { ... } });
+    ```
+
+### Cache Driver
+Passez de `file` à `redis` ou `memcached` en production pour de meilleures performances.
 ```env
-CACHE_DRIVER=redis
-REDIS_HOST=127.0.0.1
-```
-
-### Queues
-Déchargez le traitement lourd.
-```bash
-# Créer un job
-php artisan make:job ProcessPodcast
-
-# Exécuter les workers
-php artisan queue:work
-```
-
-### Optimisation des images
-```php
-// Installation intervention/image
-composer require intervention/image
-
-// Exemple d'utilisation
-use Intervention\Image\ImageManagerStatic as Image;
-
-$img = Image::make('public/foo.jpg');
-$img->resize(300, 200);
-$img->save('public/foo_modified.jpg');
-```
-
-## Tests
-
-### Configuration des tests
-```bash
-# Créer un test
-php artisan make:test UserTest
-php artisan make:test UserTest --unit
-
-# Exécuter les tests
-php artisan test
-```
-
-Exemple de test:
-```php
-class UserTest extends TestCase
-{
-    public function test_user_can_be_created()
-    {
-        $response = $this->post('/api/users', [
-            'name' => 'John Doe',
-            'email' => 'john@example.com',
-            'password' => 'password'
-        ]);
-
-        $response->assertStatus(201);
-        $this->assertDatabaseHas('users', [
-            'email' => 'john@example.com'
-        ]);
-    }
-}
-```
-
-### Factories pour les tests
-```php
-// UserFactory.php
-public function definition()
-{
-    return [
-        'name' => fake()->name(),
-        'email' => fake()->unique()->safeEmail(),
-        'password' => Hash::make('password'),
-    ];
-}
-```
-
-## Déploiement
-
-### Checklist de déploiement
-```bash
-# Optimisation
-composer install --optimize-autoloader --no-dev
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
-
-# Configuration
-php artisan key:generate
-php artisan storage:link
-php artisan migrate --force
-
-# Permissions
-chmod -R 755 storage bootstrap/cache
-chown -R www-data:www-data storage bootstrap/cache
-```
-
-### Configuration production
-Dans `.env`:
-```env
-APP_ENV=production
-APP_DEBUG=false
-APP_URL=https://votre-domaine.com
-
 CACHE_DRIVER=redis
 SESSION_DRIVER=redis
 QUEUE_CONNECTION=redis

@@ -1,377 +1,215 @@
-# Guide Symfony : Référence Complète
+# Guide Symfony : Référence Rapide
 
-Ce guide est une référence pour le développement moderne avec Symfony 6.4 / 7+. Il privilégie l'injection de dépendances, Doctrine et les bonnes pratiques.
+## Création de projet : webapp & api
 
-## Table des matières
-- [Démarrage d'un projet](#démarrage-dun-projet)
-- [Architecture et Concepts](#architecture-et-concepts)
-- [Base de Données et Doctrine](#base-de-données-et-doctrine)
-- [Authentification et Sécurité](#authentification-et-sécurité)
-- [Organisation de la Logique Métier](#organisation-de-la-logique-métier)
-- [Fonctionnalités avancées](#fonctionnalités-avancées)
-- [Commandes utiles](#commandes-utiles)
-- [Bonnes pratiques](#bonnes-pratiques)
-- [Tests](#tests)
-- [Déploiement](#déploiement)
-
-## Démarrage d'un projet
-
-### Création via Symfony CLI (Recommandé)
+### Création de projet
 ```bash
-# Installation de l'outil CLI
+# Installer le binaire Symfony CLI (Recommandé)
 curl -sS https://get.symfony.com/cli/installer | bash
 
-# Créer une application Web complète
-symfony new mon-projet --webapp
+# Créer une application Web complète (MVC, Twig, Doctrine, etc.)
+symfony new nom-projet --webapp
 
-# Créer un micro-service / API (minimal)
-symfony new mon-projet
+# Créer un micro-service ou API (Minimal)
+symfony new nom-projet
+
+# Alternative via Composer
+composer create-project symfony/skeleton nom-projet
 ```
 
 ### Serveur Local
 ```bash
-# Lancer le serveur avec support TLS
+# Installer le certificat local TLS (HTTPS)
 symfony server:ca:install
+
+# Démarrer le serveur Web local
 symfony server:start
+
+# Démarrer en arrière-plan
+symfony server:start -d
+
+# Ouvrir dans le navigateur
+symfony open:local
 ```
 
-## Architecture et Concepts
+## Commandes de base
 
-### Injection de Dépendances (DI) & Autowiring
-C'est le cœur de Symfony. Vous n'instanciez presque jamais vos classes avec `new`.
-Le conteneur de services injecte automatiquement les classes type-hintées.
+### Génération de Code (Maker Bundle)
+Symfony utilise `make` pour générer du code squelette.
 
-```php
-// src/Service/InvoiceGenerator.php
-class InvoiceGenerator
-{
-    private $mailer;
-
-    // Autowiring : Symfony sait qu'il doit injecter le service MailerInterface
-    public function __construct(MailerInterface $mailer)
-    {
-        $this->mailer = $mailer;
-    }
-}
-```
-
-### Configuration (services.yaml)
-Grâce à l'autowiring, la configuration manuelle est rare.
-```yaml
-# config/services.yaml
-services:
-    # Configuration par défaut
-    _defaults:
-        autowire: true      # Injection automatique
-        autoconfigure: true # Tags automatiques (ex: Command, EventSubscriber)
-
-    # Rendre toutes les classes de src/ disponibles comme services
-    App\:
-        resource: '../src/'
-        exclude:
-            - '../src/DependencyInjection/'
-            - '../src/Entity/'
-            - '../src/Kernel.php'
-```
-
-## Base de Données et Doctrine
-
-Doctrine est l'ORM par défaut. On utilise désormais les **Attributs PHP 8** pour le mapping.
-
-### Création d'Entités & Migrations
 ```bash
-# Assistant interactif pour créer/modifier une entité
+# Créer un Contrôleur (Route + Réponse HTTP)
+php bin/console make:controller HomeController
+
+# Créer une Entité (Classe PHP mappée en BDD)
 php bin/console make:entity Product
 
-# Créer le fichier de migration
+# Créer un Formulaire (HTML + Validation)
+php bin/console make:form ProductType
+
+# Générer un CRUD complet (Contrôleur + Form + Vues)
+php bin/console make:crud Product
+
+# Créer un fichier de Migration (Versionning structure BDD)
 php bin/console make:migration
 
-# Exécuter la migration
+# Créer une Factory (Données de test)
+php bin/console make:factory
+
+# Créer des Fixtures (Chargement données initiales)
+php bin/console make:fixtures
+
+# Créer une Commande Console personnalisée
+php bin/console make:command app:my-command
+
+# Créer un Event Subscriber (Écoute événements)
+php bin/console make:subscriber
+
+# Créer un Message & Handler (Queue Messenger)
+php bin/console make:message
+
+# Créer un Composant Twig (Vue réutilisable)
+php bin/console make:twig-component
+
+# Créer un Voter (Règles de permission avancées)
+php bin/console make:voter
+
+# Créer un Test (PHPUnit / Panther)
+php bin/console make:test
+
+# Créer un Serializer (Normalisation JSON/XML)
+php bin/console make:serializer:normalizer
+```
+
+### Modifications de table
+
+#### Workflow Doctrine
+1.  **Modifier les entités PHP** (Ajouter des propriétés, attributs, etc.).
+    ```bash
+    # Utiliser l'assistant interactif pour modifier une entité exisante
+    php bin/console make:entity User
+    ```
+2.  **Générer la migration**.
+    ```bash
+    # Créer le fichier SQL de différence
+    php bin/console make:migration
+    ```
+3.  **Appliquer la migration**.
+    ```bash
+    # Exécuter le SQL en base
+    php bin/console doctrine:migrations:migrate
+    ```
+
+#### Autres commandes Doctrine
+```bash
+# Voir le SQL qui sera exécuté (Debug)
+php bin/console doctrine:schema:update --dump-sql
+
+# Valider que le mapping PHP correspond à la BDD
+php bin/console doctrine:schema:validate
+
+# Lister l'historique des migrations
+php bin/console doctrine:migrations:list
+
+# Annuler une migration (Rollback)
+php bin/console doctrine:migrations:execute --down Version20230101120000
+
+# (Dev) Recréer la base de données de zéro
+php bin/console doctrine:database:drop --force
+php bin/console doctrine:database:create
 php bin/console doctrine:migrations:migrate
-```
-
-### Entité Moderne (PHP 8 Attributes)
-```php
-// src/Entity/Product.php
-#[ORM\Entity(repositoryClass: ProductRepository::class)]
-class Product
-{
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
-
-    #[ORM\Column(length: 255)]
-    #[Assert\NotBlank]
-    private ?string $name = null;
-
-    #[ORM\ManyToOne(inversedBy: 'products')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Category $category = null;
-
-    // Getters & Setters...
-}
-```
-
-### Repositories & QueryBuilder
-Ne pas écrire de SQL brut, utiliser le QueryBuilder dans les repositories.
-
-```php
-// src/Repository/ProductRepository.php
-public function findExpensiveProducts(float $price): array
-{
-    return $this->createQueryBuilder('p')
-        ->andWhere('p.price > :price')
-        ->setParameter('price', $price)
-        ->orderBy('p.price', 'DESC')
-        ->getQuery()
-        ->getResult();
-}
-```
-
-## Authentification et Sécurité
-
-Géré par le **SecurityBundle**.
-
-### Configuration (security.yaml)
-```yaml
-security:
-    password_hashers:
-        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
-
-    providers:
-        app_user_provider:
-            entity:
-                class: App\Entity\User
-                property: email
-
-    firewalls:
-        dev:
-            pattern: ^/(_(profiler|wdt)|css|images|js)/
-            security: false
-        main:
-            lazy: true
-            provider: app_user_provider
-            form_login:
-                login_path: app_login
-                check_path: app_login
-            logout:
-                path: app_logout
-
-    access_control:
-        - { path: ^/admin, roles: ROLE_ADMIN }
-```
-
-### Voters (Permissions Fines)
-L'équivalent des Policies de Laravel.
-```bash
-php bin/console make:voter PostVoter
-```
-
-```php
-// src/Security/PostVoter.php
-protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
-{
-    $user = $token->getUser();
-    /** @var Post $post */
-    $post = $subject;
-
-    return match($attribute) {
-        'EDIT' => $user === $post->getAuthor(),
-        'VIEW' => true,
-        default => false,
-    };
-}
-```
-
-Utilisation dans le contrôleur :
-```php
-#[IsGranted('EDIT', subject: 'post')]
-public function edit(Post $post): Response { ... }
-```
-
-## Organisation de la Logique Métier
-
-### Services
-Toute logique métier complexe doit être dans un Service, pas dans le contrôleur.
-
-```php
-// src/Service/OrderManager.php
-class OrderManager 
-{
-    public function validateAndSave(Order $order): void
-    {
-        // Validation complexe
-        // Calcul de taxes
-        // Sauvegarde BDD
-        // Envoi email
-    }
-}
-```
-
-### Symfony Messenger (Queues & Async)
-Pour traiter des tâches en arrière-plan (envoi d'emails, traitement d'images).
-
-```bash
-php bin/console make:message SmsNotification
-php bin/console make:message-handler SmsNotificationHandler
-```
-
-Envoi du message :
-```php
-public function index(MessageBusInterface $bus)
-{
-    $bus->dispatch(new SmsNotification('Hello!'));
-}
-```
-
-Le Handler (exécuté par le worker) :
-```php
-#[AsMessageHandler]
-class SmsNotificationHandler
-{
-    public function __invoke(SmsNotification $message)
-    {
-        // Envoyer le SMS
-    }
-}
-```
-
-Lancer le worker :
-```bash
-php bin/console messenger:consume async
-```
-
-## Fonctionnalités avancées
-
-### Event Dispatcher
-Découpler le code via des événements.
-
-```php
-// Créer l'event
-class UserRegisteredEvent extends Event {
-    public function __construct(public User $user) {}
-}
-
-// Subscriber
-class EmailSubscriber implements EventSubscriberInterface
-{
-    public static function getSubscribedEvents(): array
-    {
-        return [UserRegisteredEvent::class => 'onUserRegistered'];
-    }
-
-    public function onUserRegistered(UserRegisteredEvent $event): void
-    {
-        // Envoyer email de bienvenue
-    }
-}
-```
-
-### Commandes Console
-Créer ses propres commandes CLI.
-```bash
-php bin/console make:command app:create-user
-```
-
-```php
-#[AsCommand(name: 'app:create-user', description: 'Crée un nouvel utilisateur')]
-class CreateUserCommand extends Command
-{
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
-        // Logique...
-        $io = new SymfonyStyle($input, $output);
-        $io->success('User created!');
-        return Command::SUCCESS;
-    }
-}
+php bin/console doctrine:fixtures:load
 ```
 
 ## Commandes utiles
 
-### Cache & Debug
+### Debug & Inspection
 ```bash
-php bin/console cache:clear        # Vider le cache (dev & prod)
-php bin/console debug:router       # Lister les routes
-php bin/console debug:autowiring   # Voir les services injectables
-php bin/console debug:container    # Voir tous les services
+# Debugger le routeur
+php bin/console debug:router
+php bin/console debug:router app_home # Détail d'une route
+
+# Debugger le container de services
+php bin/console debug:container
+php bin/console debug:autowiring type-hint # Trouver service par type
+
+# Debugger les événements
+php bin/console debug:event-dispatcher
+
+# Debugger la configuration
+php bin/console debug:config framework
 ```
 
-### Maker Bundle (Génération de code)
+### Cache & Maintenance
 ```bash
-php bin/console make:controller
-php bin/console make:form
-php bin/console make:test
-php bin/console make:crud
+# Vider le cache (Environnement actuel)
+php bin/console cache:clear
+
+# Vider le cache de production (si on est en dev)
+php bin/console cache:clear --env=prod
+
+# Préchauffer le cache (Warmup)
+php bin/console cache:warmup
+```
+
+### Qualité de code (Linters)
+```bash
+php bin/console lint:yaml config/
+php bin/console lint:twig templates/
+php bin/console lint:container
+```
+
+### Messenger (Queue)
+```bash
+# Consommer les messages
+php bin/console messenger:consume async -vv
+
+# Voir les transports
+php bin/console debug:messenger
+```
+
+### Assets (si AssetMapper)
+```bash
+php bin/console importmap:require bootstrap
+php bin/console asset-map:compile
 ```
 
 ## Bonnes pratiques
 
-### Le Contrôleur Mince
-Un contrôleur ne doit faire que :
-1. Recevoir la Request.
-2. Appeler un Service / Form.
-3. Retourner une Response.
+*   **Injection de dépendances** : Utilisez le **Constructor Injection** et l'**Autowiring**. N'instanciez pas vos services manuellement. Typ-hintez les interfaces plutôt que les classes concrètes quand possible.
+    ```php
+    public function __construct(private MailerInterface $mailer) {}
+    ```
+*   **Repositories** : Utilisez le **QueryBuilder** standard. Évitez le SQL brut sauf nécessité absolue. Isolez les requêtes DQL dans le repository, pas dans le contrôleur.
+*   **Contrôleurs** : Ils doivent rester minces. Pas de logique métier (calculs, règles complexes) dans le contrôleur. Appelez un Service pour ça.
+*   **Environnement** : Tous les paramètres changeants (clés API, credentials DB) vont dans `.env` ou `.env.local`. Les paramètres statiques vont dans `parameters` (`services.yaml`).
+*   **Secrets** : Pour les données sensibles en prod, utilisez le coffre-fort de secrets Symfony :
+    ```bash
+    php bin/console secrets:set CLÉ_API
+    ```
+*   **Constantes** : Évitez les "magic numbers". Utilisez des constantes de classe ou des Enums PHP 8.1+.
 
-### Validation
-Utilisez le composant Validator dans vos entités ou DTOs.
-```php
-#[Assert\NotBlank]
-#[Assert\Email]
-public string $email;
-```
+## Performance et Optimisation
 
-### Variables d'Environnement
-Ne stockez jamais de secrets dans le code. Utilisez `.env.local` pour vos secrets en local.
-```bash
-# Afficher les vars réelles
-php bin/console debug:dotenv
-```
-
-## Tests
-
-Symfony s'intègre parfaitement avec PHPUnit.
-
-```bash
-php bin/console make:test
-```
-
-### Test Fonctionnel (WebTestCase)
-```php
-class LoginTest extends WebTestCase
-{
-    public function testLoginSuccessful(): void
-    {
-        $client = static::createClient();
-        $crawler = $client->request('GET', '/login');
-
-        $form = $crawler->selectButton('Sign in')->form([
-            'email' => 'user@example.com',
-            'password' => 'password',
-        ]);
-
-        $client->submit($form);
-        $this->assertResponseRedirects('/dashboard');
-    }
-}
-```
-
-## Déploiement
-
-### Checklist Production
-1.  **Environment** : `APP_ENV=prod`.
-2.  **Optimisation Composer** : `composer install --no-dev --optimize-autoloader`.
+### Production Checklist
+1.  **Environment** : Définir `APP_ENV=prod` dans `.env.local`.
+2.  **Composer** : `composer install --no-dev --optimize-autoloader`.
 3.  **Cache** :
     ```bash
     php bin/console cache:clear
     php bin/console cache:warmup
     ```
-4.  **Base de données** : `php bin/console doctrine:migrations:migrate --no-interaction`.
-5.  **Assets** : `php bin/console asset-map:compile` (si AssetMapper) ou `npm run build` (si Webpack Encore).
+4.  **Variables d'environment** : Dumper les variables pour éviter le parsing du fichier `.env` à chaque requête.
+    ```bash
+    composer dump-env prod
+    ```
 
-### Variables d'environnement de Prod
-Générez un fichier `.env.local.php` pour la performance :
-```bash
-composer dump-env prod
-```
+### Doctrine
+*   **Lazy Loading** : Attention aux associations. Utilisez `fetch="EXTRA_LAZY"` pour les collections volumineuses si vous n'avez besoin que du `count()`.
+*   **Query Cache** : Doctrine met en cache le DQL parsing.
+
+### PHP OpCache
+Assurez-vous que l'extension **OpCache** est activée et configurée pour précharger (`opcache.preload`) le fichier `config/preload.php` généré par Symfony.
+
+### Profiling
+Utilisez **Blackfire.io** ou le **Symfony Profiler** (en dev uniquement) pour identifier les goulots d'étranglement.
